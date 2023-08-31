@@ -1,0 +1,6 @@
+requests
+bs4
+lxml
+fake_useragent
+openai
+python-dotenv
