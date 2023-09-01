@@ -1,6 +1,7 @@
 import json
 import time
-
+from collections import defaultdict
+import matplotlib.pyplot as plt
 import openai
 import os
 from dotenv import load_dotenv
@@ -65,7 +66,7 @@ def get_all_required_competencies(vacancy: str):
     return all_required_competencies
 
 
-if __name__ == "__main__":
+def smart_tag_analyz():
     with open('data.json', "r", encoding='utf-8') as file:
         for i in range(50):
             line = file.readline()[:-3] + "}"
@@ -73,4 +74,50 @@ if __name__ == "__main__":
             if all_required_competencies:
                 print(i, all_required_competencies)
                 time.sleep(20)
+
+
+def tag_analyz(dct=None):
+    if dct is None:
+        dct = defaultdict(int)
+    with open('data.json', "r", encoding='utf-8') as file:
+        for line in file:
+            line = file.readline()[:-3] + "}"
+            try:
+                vacancy: dict = json.loads(line)
+            except:
+                continue
+            if vacancy['tags']:
+                for tag in vacancy['tags']:
+                    dct[tag.lower().replace('\xa0', ' ')] += 1
+    return dct
+
+
+def get_graphic(dct):
+
+
+    # Ваш словарь с д   анными
+    tech_data = dct
+
+    # Разделение данных на ключи (технологии) и значения (популярность)
+    tech_names = list(tech_data.keys())
+    popularity = list(tech_data.values())
+
+    # Создание баров на графике
+    plt.bar(tech_names, popularity)
+
+    # Добавление подписей к графику
+    plt.xlabel('Технологии')
+    plt.ylabel('Популярность')
+    plt.title('Популярность технологий')
+
+    # Поворот подписей по оси x, если они слишком длинные
+    plt.xticks(rotation=45)
+
+    # Отображение графика
+    plt.show()
+
+
+if __name__ == "__main__":
+    tag_analyz()
+
 
