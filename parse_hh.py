@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 import fake_useragent
 import time
 import json
+import sys
+
+from input_check import positive_number_check
 
 
 #  Получаем список ссылок на вакансии по заданному запросу (text)
@@ -91,11 +94,40 @@ def get_vacancy(link):
     return vacancy
 
 
-if __name__ == "__main__":
+def parsehh(request=None, output_file=None, number_of_vacancies=None):
+    if not output_file:
+        output_file = "data.json"
+    if not request:
+        request = "python"
+
     #  Открываем файл data.json на запись и в удобном для считывания формате записываем все спарсенные вакансии.
-    with open("data.json", "w", encoding="utf-8") as json_file:
+    #  Если указано необходимое количество вакансий, заводим счетчик.
+    if number_of_vacancies:
+        resp = positive_number_check(number_of_vacancies)
+        if resp != 200:
+            print(resp)
+            return
+        n = 0
+    else:
+        n = -1
+
+    # Если все хорошо, тооо.
+    print(f"Начинаем парсинг вакансий c hh.ru по запросу '{request}'...\n")
+
+    with open(output_file, "w", encoding="utf-8") as json_file:
         json_file.write("[\n")
-        for link in get_links("python"):
+        for link in get_links(request):
+            #  Обновляем счетчик
+            if n != -1:
+                n += 1
+                if n > number_of_vacancies:
+                    break
+                #  Организуем вывод в консоль прогресса
+                sys.stdout.write(f'\rВакансий получено... {n}/{number_of_vacancies}   ')
+                sys.stdout.flush()
+                time.sleep(1)
+
+
             item = get_vacancy(link)
             #  Немного спим, чтобы не перезагружать сервера hh и не улететь в бан.
             time.sleep(1)
@@ -103,4 +135,6 @@ if __name__ == "__main__":
             json_file.write(",\n")
         json_file.write("]")
 
-
+    print('\n')
+    print(f"Успешно спарсено {number_of_vacancies} вакансий по запросу '{request}'!")
+    print(f"Файл с выходными данными: {output_file}")
