@@ -7,4 +7,3 @@ def positive_number_check(number: int):
         return response
     return 200
 
-

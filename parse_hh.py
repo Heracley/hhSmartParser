@@ -108,6 +108,7 @@ def parsehh(request=None, output_file=None, number_of_vacancies=None):
             print(resp)
             return
         n = 0
+        number_of_vacancies = int(number_of_vacancies)
     else:
         n = -1
 

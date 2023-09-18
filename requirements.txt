@@ -4,3 +4,4 @@ lxml
 fake_useragent
 openai
 python-dotenv
+openpyxl
